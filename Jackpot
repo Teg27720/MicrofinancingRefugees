@@ -1,0 +1,65 @@
+#Author: Teg Louis
+#Last Revised: 1/13/2017
+#Program Description: This program decides how much to pay contestants from jackpot contestants based on the answers of an automated survey. There are exactly 6 contestants and 6 question.
+#CHANGES NEEDED: 1) Pay out money to people's bank account using the internet. 2) Agencies in the network torus are awarded based on a lottery where there probability of success based on how well their agency does compared to the total.
+
+#The 4 of lines below allow connection to our database and give us our libraries
+import sqlite3
+import sys
+conn = sqlite3.connect('surveyanswers2.db')
+c = conn.cursor()
+
+Jackpot = 6000.
+#The 2 lines below create a square 6X6 matrix. The columns correspond to the person. The rows correspond to the answer of the question. This matrix is to be stored as in a secure SQLite database.
+Num_of_Players, Num_of_Questions = 6, 6
+Survey_Matrix = [[0 for x in range(Num_of_Players)] for y in range(Num_of_Questions)]
+
+
+SurveyQuestionList = ['SurveyQuestion1','SurveyQuestion2','SurveyQuestion3','SurveyQuestion4','SurveyQuestion5','SurveyQuestion6']
+
+#The 4 lines below read in the SQLite database into a matrix be operated on by python.
+for ii in range(0, Num_of_Players):
+    for i in range(0,Num_of_Questions):
+        for row in c.execute('SELECT * FROM surveyanswers WHERE SurveyQuestions = (?)',(SurveyQuestionList[i],)):
+            Survey_Matrix[i][ii] = list(row)[ii+1]
+#print Survey_Matrix
+            
+
+QuestionRow0 = [Survey_Matrix[0][0],Survey_Matrix[0][1],Survey_Matrix[0][2],Survey_Matrix[0][3],Survey_Matrix[0][4],Survey_Matrix[0][5]]
+QuestionRow1 = [Survey_Matrix[1][0],Survey_Matrix[1][1],Survey_Matrix[1][2],Survey_Matrix[1][3],Survey_Matrix[1][4],Survey_Matrix[1][5]]
+QuestionRow2 = [Survey_Matrix[2][0],Survey_Matrix[2][1],Survey_Matrix[2][2],Survey_Matrix[2][3],Survey_Matrix[2][4],Survey_Matrix[2][5]]
+QuestionRow3 = [Survey_Matrix[3][0],Survey_Matrix[3][1],Survey_Matrix[3][2],Survey_Matrix[3][3],Survey_Matrix[3][4],Survey_Matrix[3][5]]
+QuestionRow4 = [Survey_Matrix[4][0],Survey_Matrix[4][1],Survey_Matrix[4][2],Survey_Matrix[4][3],Survey_Matrix[4][4],Survey_Matrix[4][5]]
+QuestionRow5 = [Survey_Matrix[5][0],Survey_Matrix[5][1],Survey_Matrix[5][2],Survey_Matrix[5][3],Survey_Matrix[5][4],Survey_Matrix[5][5]]
+
+
+QuestionSum = [sum(QuestionRow0),sum(QuestionRow1),sum(QuestionRow2),sum(QuestionRow3),sum(QuestionRow4),sum(QuestionRow5)]
+
+Jackpot0 = 0
+Jackpot0 = ((QuestionRow0[0]/QuestionSum[0]+QuestionRow1[0]/QuestionSum[1]+QuestionRow2[0]/QuestionSum[2]+QuestionRow3[0]/QuestionSum[3]+QuestionRow4[0]/QuestionSum[4]+QuestionRow5[0]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+Jackpot1 = 0
+Jackpot1 = ((QuestionRow0[1]/QuestionSum[0]+QuestionRow1[1]/QuestionSum[1]+QuestionRow2[1]/QuestionSum[2]+QuestionRow3[1]/QuestionSum[3]+QuestionRow4[1]/QuestionSum[4]+QuestionRow5[1]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+Jackpot2 = 0
+Jackpot2 = ((QuestionRow0[2]/QuestionSum[0]+QuestionRow1[2]/QuestionSum[1]+QuestionRow2[2]/QuestionSum[2]+QuestionRow3[2]/QuestionSum[3]+QuestionRow4[2]/QuestionSum[4]+QuestionRow5[2]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+Jackpot3 = 0
+Jackpot3 = ((QuestionRow0[3]/QuestionSum[0]+QuestionRow1[3]/QuestionSum[1]+QuestionRow2[3]/QuestionSum[2]+QuestionRow3[3]/QuestionSum[3]+QuestionRow4[3]/QuestionSum[3]+QuestionRow5[3]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+Jackpot4 = 0
+Jackpot4 = ((QuestionRow0[4]/QuestionSum[0]+QuestionRow1[4]/QuestionSum[1]+QuestionRow2[4]/QuestionSum[2]+QuestionRow3[4]/QuestionSum[3]+QuestionRow4[4]/QuestionSum[4]+QuestionRow5[4]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+Jackpot5 = 0
+Jackpot5 = ((QuestionRow0[5]/QuestionSum[0]+QuestionRow1[5]/QuestionSum[1]+QuestionRow2[5]/QuestionSum[2]+QuestionRow3[5]/QuestionSum[3]+QuestionRow4[5]/QuestionSum[4]+QuestionRow5[5]/QuestionSum[5])/Num_of_Players)*Jackpot
+
+
+Payout = []
+Payout.append(Jackpot0)
+Payout.append(Jackpot1)
+Payout.append(Jackpot2)
+Payout.append(Jackpot3)
+Payout.append(Jackpot4)
+Payout.append(Jackpot5)
+
+print Payout
