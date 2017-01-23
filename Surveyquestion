@@ -1,0 +1,224 @@
+#Finish Jackpot is calculated from a different program
+#Program Description: 180 degree test of participation skills.
+#Program Use: Screening Survey for Awarding Loans
+#Date of Last Revision: 1/17/2016
+#Authors: Teg Louis
+#Changes Needed:
+#1) Keep windows at center, http://stackoverflow.com/questions/3352918/how-to-center-a-window-on-the-screen-in-tkinter
+#2) Add sole administration privileges to sql database
+#3) Make app send final results to online sql server where it can run on individual people computers...
+import numpy as np
+from Tkinter import *
+import tkMessageBox
+import sqlite3
+import os
+
+possibleColleagueList = [1, 2, 3, 4, 5, 6]
+
+for i in range(0,len(possibleColleagueList)-1):    
+    def userInfo():
+        personalVariables = []
+        def try_login1():
+            #print("Trying to login...")
+            myList1 = list(username_guess.get())        
+            myList2 = list(password_guess.get())
+            numberTest = 0
+            numberTest = int(identificationNumber_guess.get())
+            global numberTest
+            if ((((numberTest in possibleColleagueList) == True) and (len([x for x in myList1 if x.isdigit()]) >= 2) and (15 >= len(myList1) >= 5)  and   (len([x for x in myList2 if x.isdigit()]) >= 2) and (15 >= len(myList2) >= 2)) and (numberTest in possibleColleagueList)) :
+                tkMessageBox.showinfo("-- COMPLETE --", "You Have Now Logged In.", icon="info")
+                personalVariables.append(username_guess.get())
+                personalVariables.append(identificationNumber_guess.get())
+                personalVariables.append(email_guess.get())
+                personalVariables.append(password_guess.get())
+                #print personalVariables
+                window.destroy()
+            else:
+                tkMessageBox.showinfo("-- ERROR --", "Please enter valid infomation! \nUsername and Password must be between 5 and 15 characters with at least 2 numbers", icon="warning")
+                del personalVariables[:]
+        #Gui Things
+        window = Tk()
+        window.resizable(width=FALSE, height=FALSE)
+        window.title("Log-In")
+        window.geometry("250x300")
+        
+        #Creating the username & password entry boxes
+        username_text = Label(window, text="Username:")
+        username_guess = Entry(window)
+        identificationNumber_text = Label(window, text = "I.D. Number:")
+        identificationNumber_guess = Entry(window)
+        email_text = Label(window, text="Email:")
+        email_guess = Entry(window)
+        password_text = Label(window, text="Password:")
+        password_guess = Entry(window, show="*")
+        
+        #attempt to login button
+        attempt_login = Button(text="Login", command=try_login1)
+        
+        username_text.pack()
+        username_guess.pack()
+        identificationNumber_text.pack()
+        identificationNumber_guess.pack()
+        email_text.pack()
+        email_guess.pack()
+        password_text.pack()
+        password_guess.pack()
+        attempt_login.pack()
+        #Main Starter
+        window.mainloop()
+        
+        
+        #print window.winfo_exists()
+        
+    def SQLspeak():
+        global conn
+        conn = sqlite3.connect('quizAnswers.db')
+        global c
+        c = conn.cursor()
+    
+    colleagueList = []
+    
+    
+    
+    def bestColleagues():
+            
+        def try_login2():
+            colleagueList.append(int(first_person.get()))
+            colleagueList.append(int(second_person.get()))
+            colleagueList.append(int(third_person.get()))
+            colleagueList.append(int(fourth_person.get()))
+            #Need to make sure did not include self, using numberTest... if ((numberTest in colleagueList) == False)
+            if ((len(colleagueList) == len(list(set(colleagueList)))) and (len(colleagueList) == 4) and ((numberTest in colleagueList) == False) and (colleagueList[0] in possibleColleagueList) and (colleagueList[1] in possibleColleagueList) and (colleagueList[2] in possibleColleagueList) and (colleagueList[3] in possibleColleagueList)):
+                tkMessageBox.showinfo("Thank You!", icon="info")
+                #print window.winfo_exists()    
+                window.destroy()
+    
+            else:
+                tkMessageBox.showinfo("-- ERROR --", "Please enter valid infomation! \n You should have 4 individual members between 1 and 60", icon="warning")
+                del colleagueList[:]
+        
+        #Gui Things
+        window = Tk()
+        window.resizable(width=FALSE, height=FALSE)
+        window.title("Best of Four")
+        window.geometry("250x150")
+        
+        
+        #Creating the username & password and other user info entry boxes
+        Instructions = Label(window, text= "Enter the I.D.'s for your best 4 colleagues: ")
+        first_person_text = Label(window, text= "First Person: ")
+        first_person = Entry(window)
+        second_person_text = Label(window, text="Second Person: ")
+        second_person = Entry(window)
+        third_person_text = Label(window, text="Third Person: ")
+        third_person = Entry(window)
+        fourth_person_text = Label(window, text = "Fourth Person: ")
+        fourth_person = Entry(window)
+        
+        #attempt to login button
+        attempt_login = Button(text="Login", command=try_login2)
+        
+        Instructions.grid(row = 0, columnspan = 3)
+        first_person_text.grid(row = 1, column = 0, sticky = W)
+        first_person.grid(row = 1, column = 1)
+        second_person_text.grid(row = 2, column = 0, sticky = W)
+        second_person.grid(row = 2, column = 1)
+        third_person_text.grid(row = 3, column = 0, sticky = W)
+        third_person.grid(row = 3, column = 1)
+        fourth_person_text.grid(row = 4, column = 0, sticky = W)
+        fourth_person.grid(row = 4, column = 1)
+        attempt_login.grid(row = 5, column = 1)
+        #Main Starter
+        window.mainloop()
+        
+    
+    personsAnswer = ""
+    PersonsAnswers = []
+    QuestionList = ["How Much Paid to Refugees", "Number of Refugees Employeed", "Retainment of Refugees", "Loan Repayment Rate of Refugees", "Default Rate of Refugees","Customer Satisfaction"]
+    
+    personName = ""
+    personInfo = []
+    
+    userInfo()
+    bestColleagues()
+    colleagueListScrambled = []
+    
+               
+    def selfEval():
+        #We use a for loop so that we don't have a lot more code. It iterates through the list of question and options
+        for  i in range(0,len(QuestionList)):
+            root4 = Tk()
+            root4.wm_title("Rank Colleagues with 1 being the LOWEST and 4 being the HIGHEST")
+            #These next line replace the icon on the Tkinter window, save .ico with software
+            root4.iconbitmap(default='logo.ico')
+            #And we want people mentioned in the list to be in a different random order to keep out bias
+            var = IntVar()
+            Label(root4)
+            label1 = Label(root4, text = QuestionList[i])
+            label1.grid(columnspan = 2)
+            label1.grid(row=0, sticky= E)
+            
+            R1 = Radiobutton(root4, text = "FIRST PERSON", variable = var, value = 1)
+            R1.grid(row = 1)
+            R1.grid(columnspan = 2)
+            
+            R2 = Radiobutton(root4, text = "SECOND PERSON", variable = var, value = 2)
+            R2.grid(row = 2)
+            R2.grid(columnspan = 2)
+            
+            R3 = Radiobutton(root4, text = "THIRD PERSON", variable = var, value = 3)
+            R3.grid(row = 3)
+            R3.grid(columnspan = 2)
+            
+            R4 = Radiobutton(root4, text = "FOURTH PERSON", variable = var, value = 4)
+            R4.grid(row = 4)
+            R4.grid(columnspan = 2)
+   
+            R5 = Radiobutton(root4, text = "FIFTH PERSON", variable = var, value = 4)
+            R5.grid(row = 4)
+            R5.grid(columnspan = 2)         
+            
+            R6 = Radiobutton(root4, text = "SIXTH PERSON", variable = var, value = 4)
+            R6.grid(row = 4)
+            R6.grid(columnspan = 2)     
+
+            button2 = Button (root4, text = "Submit Answer", command = root4.destroy)
+            button2.grid(row = 5)
+            button2.grid(columnspan = 2)
+            
+            
+            root4.mainloop()
+            
+            #Should be int? I don't know... or number may have to be strings and then converted.. 
+            personsAnswer = str(var.get())
+            PersonsAnswers.append(personsAnswer)
+            print personsAnswer
+        
+    
+    #Checks to see if made, if not we want it to be created
+    if os.path.isfile('quizAnswers.db'):
+        SQLspeak()
+        # Insert a row of data
+        c.execute('INSERT INTO quizAnswers VALUES (?, ?, ?, ?, ?,?)', (PersonsAnswers[0], PersonsAnswers[1], PersonsAnswers[2], PersonsAnswers[3], PersonsAnswers[4], PersonsAnswers[5]))
+    
+    else:
+        SQLspeak()
+        # Create table
+        c.execute('''CREATE TABLE quizAnswers (UserName TEXT, IdentificationNumber TEXT, Email TEXT, Password TEXT, BestColleague1 TEXT, BestColleague1 TEXT, BestColleague2 TEXT, BestColleague3 TEXT, BestColleague4 TEXT, Answer1 TEXT, Answer2 TEXT, Answer3 TEXT, Answer4 TEXT, Answer5 TEXT, Answer6 TEXT, Answer7 TEXT, Answer8 TEXT, Answer9 TEXT, Answer10 TEXT, Answer11 TEXT)''')
+    
+    conn.commit()
+    
+    conn.close()
+    
+    
+    selfeval()
+    print PersonsAnswers
+    #Clear all necessary global variables... does not include database yet
+    del colleagueList[:]
+    del colleagueListScrambled[:]
+    del personInfo[:]
+    del personsAnswer[:]
+    del personName[:]
+    del PersonsAnswers[:]
+    #Possible colleague list deleted only by administration...
+    #del possibleColleagueList[:]
